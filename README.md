@@ -35,3 +35,13 @@ No entanto, se você quiser uma sugestão de boas práticas para manter o histó
 1. Faça um clone ou fork deste repositório.
 2. Altere os nomes das variáveis e as rotas da API no código para bater com o seu servidor C++.
 3. **Adapte a interface ao seu tema:** Se a base tem variáveis como `item` e `preco`, você pode facilmente alterar para a sua realidade. Por exemplo, transformar a listagem genérica em um gerenciador de estoque para uma loja como a *Rock 'n' Code Instrumentos*, uma locadora de carros, ou um sistema de biblioteca.
+
+## Nossos colaboradores:
+
+Time de engenheiros internacionais:
+
+- :cn: Chinês [Xa ti Gip Ti]()
+- :de: Alemão [gröek]()
+- :ru: Russo [Klávdi]()
+- :india: Indiano [Dji Mí Nai]()
+- :kr: Coreano [Dip Sik]()
