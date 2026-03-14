@@ -3,9 +3,10 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Header from './components/Header';
 import Home from './pages/Home';
 import ClientesList from './pages/ClientesList';
-import ProdutosList from './pages/ProdutosList'; // <-- Importação do novo componente
+import ProdutosList from './pages/ProdutosList';
+import VendasList from './pages/VendasList'; // <-- Importação nova
+import NovaVenda from './pages/NovaVenda';   // <-- Importação nova
 
-// Componente de Layout para manter o Header fixo
 const Layout = () => (
   <>
     <Header />
@@ -26,8 +27,10 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="clientes" element={<ClientesList />} />
-          {/* Nova rota adicionada para os produtos */}
           <Route path="produtos" element={<ProdutosList />} />
+          {/* Rotas de Vendas */}
+          <Route path="vendas" element={<VendasList />} />
+          <Route path="vendas/nova" element={<NovaVenda />} />
         </Route>
       </Routes>
     </Router>
