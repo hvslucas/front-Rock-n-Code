@@ -24,6 +24,11 @@ Para que este template evolua e ajude todos os grupos da disciplina, a colabora�
 3. **Faça o Commit:** Faça commits claros, objetivos e, se necessário, use o `git commit --amend` para manter o histórico limpo antes de enviar.
 4. **Abra um Pull Request (PR):** Faça o push da sua branch e abra um PR para a `main`. Descreva brevemente o que foi feito e referencie a Issue original (ex: "Resolve #3").
 
+**Padrão de Commits e PRs:**
+Não há critérios rígidos e obrigatórios de formatação para os commits ou descrições de Pull Requests neste repositório. A regra de ouro é: **seja claro e simples de entender**. 
+
+No entanto, se você quiser uma sugestão de boas práticas para manter o histórico legível e organizado, recomendamos fortemente o uso do padrão **[Conventional Commits](https://www.conventionalcommits.org/pt-br/v1.0.0/)** (exemplo: `feat: adiciona componente de tabela` ou `fix: corrige quebra de layout no mobile`). Ou algo semelhante a isso...
+
 ### 🧩 **Como utilizar no seu grupo:**
 
 **Fluxo de adoção do template:**
