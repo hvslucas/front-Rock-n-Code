@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Container, Row, Col, Alert } from 'react-bootstrap';
+import { Table, Button, Modal, Form, Container, Row, Col, Alert, InputGroup } from 'react-bootstrap';
+import { useOutletContext } from 'react-router-dom';
 import { api } from '../services/api';
 
 const ClientesList = () => {
+  const { theme } = useOutletContext();
   const [clientes, setClientes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Estado para gerir o feedback visual
   const [alerta, setAlerta] = useState({ show: false, variant: '', message: '' });
+
+  // --- Estados de Filtro e Ordenação ---
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('id-asc');
 
   const [showFormModal, setShowFormModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -72,7 +76,7 @@ const ClientesList = () => {
         mostrarAlerta('success', 'Novo cliente registado com sucesso!');
       }
       handleCloseForm();
-      carregarClientes(); // Recarrega a lista
+      carregarClientes();
     } catch (error) {
       mostrarAlerta('danger', 'Ocorreu um erro ao salvar o cliente.');
     }
@@ -83,11 +87,21 @@ const ClientesList = () => {
       await api.delete(`/clientes/${clienteToDelete.id}`);
       mostrarAlerta('success', 'Cliente eliminado com sucesso!');
       handleCloseDelete();
-      carregarClientes(); // Recarrega a lista
+      carregarClientes();
     } catch (error) {
       mostrarAlerta('danger', 'Erro ao tentar eliminar o cliente.');
     }
   };
+
+  // --- Lógica de Derivação (Filtro + Ordenação) ---
+  const clientesFiltrados = clientes
+    .filter(cliente => cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => {
+      if (sortBy === 'nome-asc') return a.nome.localeCompare(b.nome);
+      if (sortBy === 'nome-desc') return b.nome.localeCompare(a.nome);
+      if (sortBy === 'id-desc') return b.id - a.id;
+      return a.id - b.id; // id-asc (padrão)
+    });
 
   return (
     <Container className="mt-4">
@@ -98,25 +112,55 @@ const ClientesList = () => {
       )}
 
       <Row className="mb-3 align-items-center">
-        <Col><h2>Gestão de Clientes</h2></Col>
-        <Col className="text-end">
+        <Col md={4}><h2>Gestão de Clientes</h2></Col>
+        <Col md={8} className="text-end">
           <Button variant="success" onClick={handleShowNew} disabled={isLoading}>
             + Novo Cliente
           </Button>
         </Col>
       </Row>
 
-      <Table striped bordered hover responsive>
+      {/* --- Toolbar de Filtros --- */}
+      <div className="p-3 mb-4 rounded border" style={{ backgroundColor: theme === 'dark' ? '#212529' : '#f8f9fa' }}>
+        <Row>
+          <Col md={6}>
+            <Form.Group>
+              <Form.Label className="fw-bold">Buscar Cliente:</Form.Label>
+              <InputGroup>
+                <InputGroup.Text>🔍</InputGroup.Text>
+                <Form.Control 
+                  placeholder="Buscar por nome..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </InputGroup>
+            </Form.Group>
+          </Col>
+          <Col md={6} className="mt-3 mt-md-0">
+            <Form.Group>
+              <Form.Label className="fw-bold">Ordenar por:</Form.Label>
+              <Form.Select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="id-asc">ID (Crescente)</option>
+                <option value="id-desc">ID (Decrescente)</option>
+                <option value="nome-asc">Ordem Alfabética (A-Z)</option>
+                <option value="nome-desc">Ordem Alfabética (Z-A)</option>
+              </Form.Select>
+            </Form.Group>
+          </Col>
+        </Row>
+      </div>
+
+      <Table variant={theme} striped bordered hover responsive>
         <thead>
           <tr><th>ID</th><th>Nome</th><th>E-mail</th><th>Contato</th><th>Ações</th></tr>
         </thead>
         <tbody>
           {isLoading ? (
             <tr><td colSpan="5" className="text-center">A processar...</td></tr>
-          ) : clientes.length === 0 ? (
-            <tr><td colSpan="5" className="text-center">Nenhum cliente cadastrado.</td></tr>
+          ) : clientesFiltrados.length === 0 ? (
+            <tr><td colSpan="5" className="text-center">Nenhum cliente encontrado.</td></tr>
           ) : (
-            clientes.map((cliente) => (
+            clientesFiltrados.map((cliente) => (
               <tr key={cliente.id}>
                 <td>{cliente.id}</td><td>{cliente.nome}</td><td>{cliente.email}</td><td>{cliente.contato}</td>
                 <td>
@@ -129,7 +173,7 @@ const ClientesList = () => {
         </tbody>
       </Table>
 
-      {/* Modal Formulário */}
+      {/* --- Modais --- */}
       <Modal show={showFormModal} onHide={handleCloseForm}>
         <Modal.Header closeButton><Modal.Title>{isEditing ? 'Editar Cliente' : 'Novo Cliente'}</Modal.Title></Modal.Header>
         <Modal.Body>
@@ -154,7 +198,6 @@ const ClientesList = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal Eliminar */}
       <Modal show={showDeleteModal} onHide={handleCloseDelete}>
         <Modal.Header closeButton><Modal.Title>Confirmar Exclusão</Modal.Title></Modal.Header>
         <Modal.Body>Tem certeza que deseja eliminar o cliente <strong>{clienteToDelete?.nome}</strong>?</Modal.Body>
