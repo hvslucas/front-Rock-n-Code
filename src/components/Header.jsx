@@ -6,7 +6,7 @@ const Header = ({ theme, toggleTheme }) => {
   const navBackgroundColor = theme === 'dark' ? '#121212' : '#212529';
   
   const username = localStorage.getItem('auth-user') || 'Usuário';
-  const userRole = localStorage.getItem('auth-role'); // Resgata o perfil do utilizador
+  const userRole = localStorage.getItem('auth-role');
 
   const handleLogout = () => {
     localStorage.removeItem('auth-token');
@@ -24,7 +24,6 @@ const Header = ({ theme, toggleTheme }) => {
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">Home</Nav.Link>
             
-            {/* Renderiza menus administrativos SOMENTE se for funcionário */}
             {userRole === 'funcionario' && (
               <>
                 <Nav.Link as={Link} to="/clientes">Gestão de Clientes</Nav.Link>
@@ -33,11 +32,11 @@ const Header = ({ theme, toggleTheme }) => {
               </>
             )}
 
-            {/* Renderiza menus de cliente SOMENTE se for cliente */}
             {userRole === 'cliente' && (
               <>
-                <Nav.Link as={Link} to="#">A Minha Conta</Nav.Link>
-                <Nav.Link as={Link} to="#">Meus Pedidos</Nav.Link>
+                {/* Links atualizados para apontarem para as novas rotas */}
+                <Nav.Link as={Link} to="/minha-conta">A Minha Conta</Nav.Link>
+                <Nav.Link as={Link} to="/meus-pedidos">Meus Pedidos</Nav.Link>
               </>
             )}
           </Nav>
