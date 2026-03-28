@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Container, Row, Col, Alert } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useOutletContext } from 'react-router-dom';
 import { api } from '../services/api';
 
 const VendasList = () => {
+  const { theme } = useOutletContext();
   const [vendas, setVendas] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [alerta, setAlerta] = useState({ show: false, variant: '', message: '' });
@@ -14,11 +15,7 @@ const VendasList = () => {
       const data = await api.get('/vendas');
       setVendas(data);
     } catch (error) {
-      setAlerta({ 
-        show: true, 
-        variant: 'danger', 
-        message: 'Erro ao carregar o histórico de vendas do servidor.' 
-      });
+      setAlerta({ show: true, variant: 'danger', message: 'Erro ao carregar o histórico de vendas do servidor.' });
     } finally {
       setIsLoading(false);
     }
@@ -47,7 +44,7 @@ const VendasList = () => {
         </Col>
       </Row>
 
-      <Table striped bordered hover responsive>
+      <Table variant={theme} striped bordered hover responsive>
         <thead>
           <tr>
             <th>ID da Venda</th>
@@ -69,7 +66,6 @@ const VendasList = () => {
             vendas.map((venda) => (
               <tr key={venda.id}>
                 <td>{venda.id}</td>
-                {/* Como salvamos o clienteId no payload, exibimos ele aqui. Num cenário real com junção de tabelas (JOIN), o backend enviaria o nome. */}
                 <td>Cliente #{venda.clienteId}</td>
                 <td>{venda.data}</td>
                 <td>{Number(venda.total).toFixed(2)}</td>

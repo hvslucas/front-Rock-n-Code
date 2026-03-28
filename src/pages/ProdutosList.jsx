@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Container, Row, Col, Alert } from 'react-bootstrap';
+import { useOutletContext } from 'react-router-dom';
 import { api } from '../services/api';
 
 const ProdutosList = () => {
+  // Extrai o tema passado pelo context do App.jsx (Layout)
+  const { theme } = useOutletContext(); 
+
   const [produtos, setProdutos] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Estado para gerir o feedback visual (Toasts/Alerts)
   const [alerta, setAlerta] = useState({ show: false, variant: '', message: '' });
 
   const [showFormModal, setShowFormModal] = useState(false);
@@ -72,7 +74,7 @@ const ProdutosList = () => {
         mostrarAlerta('success', 'Novo registo criado com sucesso!');
       }
       handleCloseForm();
-      carregarProdutos(); // Atualiza a lista após salvar
+      carregarProdutos(); // Atualiza a lista
     } catch (error) {
       mostrarAlerta('danger', 'Ocorreu um erro ao salvar as alterações.');
     }
@@ -83,7 +85,7 @@ const ProdutosList = () => {
       await api.delete(`/produtos/${produtoToDelete.id}`);
       mostrarAlerta('success', 'Registo eliminado com sucesso!');
       handleCloseDelete();
-      carregarProdutos(); // Atualiza a lista após eliminar
+      carregarProdutos(); // Atualiza a lista
     } catch (error) {
       mostrarAlerta('danger', 'Erro ao tentar eliminar o registo.');
     }
@@ -91,7 +93,6 @@ const ProdutosList = () => {
 
   return (
     <Container className="mt-4">
-      {/* Área de Notificações */}
       {alerta.show && (
         <Alert variant={alerta.variant} onClose={() => setAlerta({ ...alerta, show: false })} dismissible>
           {alerta.message}
@@ -99,7 +100,7 @@ const ProdutosList = () => {
       )}
 
       <Row className="mb-3 align-items-center">
-        <Col><h2>Catálogo</h2></Col>
+        <Col><h2>Catálogo de Produtos</h2></Col>
         <Col className="text-end">
           <Button variant="success" onClick={handleShowNew} disabled={isLoading}>
             + Adicionar
@@ -107,7 +108,8 @@ const ProdutosList = () => {
         </Col>
       </Row>
 
-      <Table striped bordered hover responsive>
+      {/* Tabela reage ao tema claro/escuro lido do contexto */}
+      <Table variant={theme} striped bordered hover responsive>
         <thead>
           <tr><th>ID</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Qtd</th><th>Ações</th></tr>
         </thead>
@@ -131,33 +133,56 @@ const ProdutosList = () => {
         </tbody>
       </Table>
 
-      {/* O código dos Modais de Formulário e Exclusão permanece idêntico à versão anterior... */}
+      {/* Modal Formulário */}
       <Modal show={showFormModal} onHide={handleCloseForm}>
         <Modal.Header closeButton><Modal.Title>{isEditing ? 'Editar' : 'Criar Novo'}</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group className="mb-3"><Form.Label>Nome</Form.Label><Form.Control type="text" name="nome" value={currentProduto.nome} onChange={handleChange} /></Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Nome</Form.Label>
+              <Form.Control type="text" name="nome" value={currentProduto.nome} onChange={handleChange} />
+            </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Categoria</Form.Label>
               <Form.Select name="categoria" value={currentProduto.categoria} onChange={handleChange}>
                 <option value="">Selecione...</option>
-                <option value="Categoria A">Categoria A</option>
-                <option value="Categoria B">Categoria B</option>
+                <option value="Cordas">Cordas</option>
+                <option value="Teclas">Teclas</option>
+                <option value="Percussão">Percussão</option>
+                <option value="Sopro">Sopro</option>
+                <option value="Acessórios">Acessórios</option>
               </Form.Select>
             </Form.Group>
             <Row>
-              <Col md={6}><Form.Group className="mb-3"><Form.Label>Preço</Form.Label><Form.Control type="number" step="0.01" name="preco" value={currentProduto.preco} onChange={handleChange} /></Form.Group></Col>
-              <Col md={6}><Form.Group className="mb-3"><Form.Label>Quantidade</Form.Label><Form.Control type="number" name="quantidade" value={currentProduto.quantidade} onChange={handleChange} /></Form.Group></Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Preço</Form.Label>
+                  <Form.Control type="number" step="0.01" name="preco" value={currentProduto.preco} onChange={handleChange} />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Quantidade</Form.Label>
+                  <Form.Control type="number" name="quantidade" value={currentProduto.quantidade} onChange={handleChange} />
+                </Form.Group>
+              </Col>
             </Row>
           </Form>
         </Modal.Body>
-        <Modal.Footer><Button variant="secondary" onClick={handleCloseForm}>Cancelar</Button><Button variant="primary" onClick={handleSave}>Salvar</Button></Modal.Footer>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseForm}>Cancelar</Button>
+          <Button variant="primary" onClick={handleSave}>Salvar</Button>
+        </Modal.Footer>
       </Modal>
 
+      {/* Modal Eliminar */}
       <Modal show={showDeleteModal} onHide={handleCloseDelete}>
         <Modal.Header closeButton><Modal.Title>Atenção</Modal.Title></Modal.Header>
         <Modal.Body>Confirma a exclusão de <strong>{produtoToDelete?.nome}</strong>?</Modal.Body>
-        <Modal.Footer><Button variant="secondary" onClick={handleCloseDelete}>Cancelar</Button><Button variant="danger" onClick={handleDelete}>Confirmar</Button></Modal.Footer>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseDelete}>Cancelar</Button>
+          <Button variant="danger" onClick={handleDelete}>Confirmar</Button>
+        </Modal.Footer>
       </Modal>
     </Container>
   );

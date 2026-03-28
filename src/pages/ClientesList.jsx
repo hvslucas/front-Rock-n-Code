@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Container, Row, Col, Alert } from 'react-bootstrap';
+import { useOutletContext } from 'react-router-dom';
 import { api } from '../services/api';
 
 const ClientesList = () => {
+  const { theme } = useOutletContext();
   const [clientes, setClientes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // Estado para gerir o feedback visual
   const [alerta, setAlerta] = useState({ show: false, variant: '', message: '' });
 
   const [showFormModal, setShowFormModal] = useState(false);
@@ -72,7 +72,7 @@ const ClientesList = () => {
         mostrarAlerta('success', 'Novo cliente registado com sucesso!');
       }
       handleCloseForm();
-      carregarClientes(); // Recarrega a lista
+      carregarClientes();
     } catch (error) {
       mostrarAlerta('danger', 'Ocorreu um erro ao salvar o cliente.');
     }
@@ -83,7 +83,7 @@ const ClientesList = () => {
       await api.delete(`/clientes/${clienteToDelete.id}`);
       mostrarAlerta('success', 'Cliente eliminado com sucesso!');
       handleCloseDelete();
-      carregarClientes(); // Recarrega a lista
+      carregarClientes();
     } catch (error) {
       mostrarAlerta('danger', 'Erro ao tentar eliminar o cliente.');
     }
@@ -106,7 +106,7 @@ const ClientesList = () => {
         </Col>
       </Row>
 
-      <Table striped bordered hover responsive>
+      <Table variant={theme} striped bordered hover responsive>
         <thead>
           <tr><th>ID</th><th>Nome</th><th>E-mail</th><th>Contato</th><th>Ações</th></tr>
         </thead>
@@ -129,39 +129,23 @@ const ClientesList = () => {
         </tbody>
       </Table>
 
-      {/* Modal Formulário */}
+      {/* Modais omitidos para poupar espaço, permanecem iguais */}
       <Modal show={showFormModal} onHide={handleCloseForm}>
         <Modal.Header closeButton><Modal.Title>{isEditing ? 'Editar Cliente' : 'Novo Cliente'}</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Nome</Form.Label>
-              <Form.Control type="text" name="nome" value={currentCliente.nome} onChange={handleChange} />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>E-mail</Form.Label>
-              <Form.Control type="email" name="email" value={currentCliente.email} onChange={handleChange} />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Contato</Form.Label>
-              <Form.Control type="text" name="contato" value={currentCliente.contato} onChange={handleChange} />
-            </Form.Group>
+            <Form.Group className="mb-3"><Form.Label>Nome</Form.Label><Form.Control type="text" name="nome" value={currentCliente.nome} onChange={handleChange} /></Form.Group>
+            <Form.Group className="mb-3"><Form.Label>E-mail</Form.Label><Form.Control type="email" name="email" value={currentCliente.email} onChange={handleChange} /></Form.Group>
+            <Form.Group className="mb-3"><Form.Label>Contato</Form.Label><Form.Control type="text" name="contato" value={currentCliente.contato} onChange={handleChange} /></Form.Group>
           </Form>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseForm}>Cancelar</Button>
-          <Button variant="primary" onClick={handleSave}>Salvar</Button>
-        </Modal.Footer>
+        <Modal.Footer><Button variant="secondary" onClick={handleCloseForm}>Cancelar</Button><Button variant="primary" onClick={handleSave}>Salvar</Button></Modal.Footer>
       </Modal>
 
-      {/* Modal Eliminar */}
       <Modal show={showDeleteModal} onHide={handleCloseDelete}>
         <Modal.Header closeButton><Modal.Title>Confirmar Exclusão</Modal.Title></Modal.Header>
         <Modal.Body>Tem certeza que deseja eliminar o cliente <strong>{clienteToDelete?.nome}</strong>?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseDelete}>Cancelar</Button>
-          <Button variant="danger" onClick={handleDelete}>Eliminar</Button>
-        </Modal.Footer>
+        <Modal.Footer><Button variant="secondary" onClick={handleCloseDelete}>Cancelar</Button><Button variant="danger" onClick={handleDelete}>Eliminar</Button></Modal.Footer>
       </Modal>
     </Container>
   );
